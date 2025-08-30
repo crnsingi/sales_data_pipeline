@@ -40,3 +40,34 @@ def get_sales_data():
     conn.close()
     return df
     
+# --- generate_report.py ---
+import pandas as pd
+import matplotlib.pyplot as plt
+from openpyxl import load_workbook
+from fetch_data import get_sales_data
+
+def generate_excel_report(filename='sales_report.xlsx'):
+    df = get_sales_data()
+    df['total'] = df['quantity'] * df['price']
+    
+    summary = df.groupby('product')['total'].sum().reset_index()
+    
+    with pd.ExcelWriter(filename, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name='Raw Data', index=False)
+        summary.to_excel(writer, sheet_name='Summary', index=False)
+        
+        plt.figure()
+        plt.bar(summary['product'], summary['total'])
+        plt.title('Sales by Product')
+        plt.xlabel('Product')
+        plt.ylabel('Total Sales')
+        
+        chart_image = 'chart.png'
+        plt.savefig(chart_image)
+        
+        wb = load_workbook(filename)
+        ws = wb.create_sheet('Charts')
+        from openpyxl.drawing.image import Image
+        img = Image(chart_image)
+        ws.add_image(img, 'A1')
+        wb.save(filename)
