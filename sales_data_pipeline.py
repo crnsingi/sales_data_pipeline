@@ -17,10 +17,10 @@ def init_db():
         )
     
     data = [
-        ('2025-08-25','Widget A',10, 9.99),
-        ('2025-08-25','Widget B',10, 19.99),
-        ('2025-08-26','Widget A',10, 9.99),
-        ('2025-08-26','Widget C',10, 29.99),
+        ('2025-08-25', 'Widget A', 10, 9.99),
+        ('2025-08-25', 'Widget B', 10, 19.99),
+        ('2025-08-26', 'Widget A', 10, 9.99),
+        ('2025-08-26', 'Widget C', 10, 29.99),
     ]
     cursor.executemany('INSERT INTO sales (date, product, quantity, price) VALUES(?,?,?,?)',data)
     
@@ -29,3 +29,14 @@ def init_db():
     
     if __name__ == "__main__":
         init_db()
+        
+# --- fetch_data.py ---
+import pandas as pd
+import sqlite3
+
+def get_sales_data():
+    conn = sqlite3.connect('sales.db')
+    df = pd.read_sql_query('SELECT * FROM sales', conn)
+    conn.close()
+    return df
+    
