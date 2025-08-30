@@ -71,3 +71,18 @@ def generate_excel_report(filename='sales_report.xlsx'):
         img = Image(chart_image)
         ws.add_image(img, 'A1')
         wb.save(filename)
+        
+# --- app.py ---
+from flask import Flask, send_file
+from generate_report import generate_excel_report
+
+app = Flask(__name__)
+
+@app.route('/report', methods=['GET'])
+def get_report():
+    filename = 'sales_report.xlsx'
+    generate_excel_report(filename)
+    return send_file(filename, as_attachment=True)
+
+if __name__ == '__main__':
+    app.run(debug=True)
